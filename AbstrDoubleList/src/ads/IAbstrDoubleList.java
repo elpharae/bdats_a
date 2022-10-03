@@ -18,11 +18,11 @@ public interface IAbstrDoubleList<T> {
     T zpristupniNaslednika() throws AbstrDoubleListException;
     T zpristupniPredchudce() throws AbstrDoubleListException;
 
-    T odeberAktualni();
-    T odeberPrvni();
-    T odeberPosledni();
-    T odeberNaslednika();
-    T odeberPredchudce();
+    T odeberAktualni() throws AbstrDoubleListException;
+    T odeberPrvni() throws AbstrDoubleListException;
+    T odeberPosledni() throws AbstrDoubleListException;
+    T odeberNaslednika() throws AbstrDoubleListException;
+    T odeberPredchudce() throws AbstrDoubleListException;
 
     Iterator<T> iterator();
 
