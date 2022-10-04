@@ -168,8 +168,8 @@ public class AbstrDoubleList<T> implements IAbstrDoubleList<T> {
             throw new AbstrDoubleListException();
         }
 
-        ListItem<T> vybrany = this.prvni;
-        return vybrany.data;
+        this.aktualni = this.prvni;
+        return zpristupniAktualni();
     }
 
     @Override
@@ -177,9 +177,8 @@ public class AbstrDoubleList<T> implements IAbstrDoubleList<T> {
         if (this.pocet == 0 || this.posledni == null) {
             throw new AbstrDoubleListException();
         }
-
-        ListItem<T> vybrany = this.posledni;
-        return vybrany.data;
+        this.aktualni = this.posledni;
+        return zpristupniAktualni();
     }
 
     @Override
@@ -188,8 +187,8 @@ public class AbstrDoubleList<T> implements IAbstrDoubleList<T> {
             throw new AbstrDoubleListException();
         }
 
-        ListItem<T> vybrany = this.aktualni.dalsi;
-        return vybrany.data;
+        this.aktualni = this.aktualni.dalsi;
+        return zpristupniAktualni();
     }
 
     @Override
@@ -198,8 +197,8 @@ public class AbstrDoubleList<T> implements IAbstrDoubleList<T> {
             throw new AbstrDoubleListException();
         }
 
-        ListItem<T> vybrany = this.aktualni.dalsi;
-        return vybrany.data;
+        this.aktualni = this.aktualni.predchozi;
+        return zpristupniAktualni();
     }
 
     @Override
