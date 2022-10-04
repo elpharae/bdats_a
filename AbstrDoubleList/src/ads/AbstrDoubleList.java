@@ -330,15 +330,18 @@ public class AbstrDoubleList<T> implements IAbstrDoubleList<T> {
     public Iterator<T> iterator() {
         return new Iterator<T>() {
 
+            private ListItem<T> akt = prvni;
 
             @Override
             public boolean hasNext() {
-
+                return akt != posledni;
             }
 
             @Override
             public T next() {
-                
+                T data = akt.data;
+                akt = akt.dalsi;
+                return data;
             }
 
         };
