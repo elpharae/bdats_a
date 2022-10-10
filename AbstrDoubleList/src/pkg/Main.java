@@ -1,4 +1,7 @@
-package app;
+package pkg;
+
+import proces.Proces;
+import proces.ProcesManualni;
 
 public class Main {
 

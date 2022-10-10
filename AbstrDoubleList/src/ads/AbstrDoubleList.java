@@ -1,36 +1,16 @@
 package ads;
 
+import java.io.Serializable;
 import java.util.Iterator;
 
-public class AbstrDoubleList<T> implements IAbstrDoubleList<T> {
-
-    /*
-     * Otázky na konzultaci:
-     * 
-     * 1. V rozhraní není definována metoda na nastavení aktuálního prvku. Jak se vybírá aktuální prvek?
-     * 2. Metody vlozX - Inicializují aktuální prvek?
-     * 
-     * Metoda odeberPrvni
-     *  3. Po odebrání prvního prvku se druhý prvek v pořadí stane prvním?
-     *  4. Pokud první je zároveň aktuální, co se stane s aktuálním?
-     * 
-     * Metoda odeberPosledni 
-     *  5. Po odebrání posledního prvku se předposlední prvek v pořadí stane posledním?
-     *  6. Pokud poslední je zároveň aktuální, co se stane s aktuálním?
-     * 
-     * Metoda odeberNaslednika a odeberPredchudce:
-     *  7. Pokud je v seznamu pouze 1 prvek, co se má stát?
-     * 
-     * 8. Jednosměrný iterátor pro obousměrný list?
-     * 9. List je cyklicky zřetězený, nebude metoda hasNext vždy vracet true?
-     */
+public class AbstrDoubleList<T> implements IAbstrDoubleList<T>, Serializable {
 
     private int pocet;
     private ListItem<T> prvni;
     private ListItem<T> aktualni;
     private ListItem<T> posledni;
 
-    private static class ListItem<T> {
+    private static class ListItem<T> implements Serializable {
 
         private final T data;
         private ListItem<T> dalsi;
@@ -238,8 +218,7 @@ public class AbstrDoubleList<T> implements IAbstrDoubleList<T> {
             throw new AbstrDoubleListException();
         }
 
-        if (this.prvni == this.aktualni)
-            this.aktualni = null;
+        if (this.prvni == this.aktualni) this.aktualni = null;
 
         this.pocet--;
         ListItem<T> odebirany = this.prvni;
@@ -249,7 +228,7 @@ public class AbstrDoubleList<T> implements IAbstrDoubleList<T> {
         pred.dalsi = po;
         po.predchozi = pred;
 
-        this.prvni = po; // v případě, že po odebrání prvního se druhý stane prvním, viz otázka
+        this.prvni = po;
 
         return odebirany.data;
     }
@@ -268,8 +247,7 @@ public class AbstrDoubleList<T> implements IAbstrDoubleList<T> {
         pred.dalsi = po;
         po.predchozi = pred;
 
-        this.posledni = pred; // v případě, že po odebrání posledního se předposlední stane posledním, viz
-                              // otázka
+        this.posledni = pred;
 
         return odebirany.data;
 
@@ -333,14 +311,18 @@ public class AbstrDoubleList<T> implements IAbstrDoubleList<T> {
 
             @Override
             public boolean hasNext() {
-                return akt != posledni;
+                return akt != posledni.dalsi;
             }
 
             @Override
             public T next() {
-                T data = akt.data;
-                akt = akt.dalsi;
-                return data;
+                if (hasNext()) {
+                    T data = akt.data;
+                    akt = akt.dalsi;
+                    return data;
+                }
+
+                return null;
             }
 
         };
