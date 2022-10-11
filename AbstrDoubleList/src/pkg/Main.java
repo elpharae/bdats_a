@@ -11,24 +11,25 @@ import procesy.VyrobniProcesException;
 public class Main {
 
     public static void main(String[] args) throws AbstrDoubleListException {
-        VyrobniProces proces = new VyrobniProces();
+        
+        VyrobniProces importovane = new VyrobniProces();
+        VyrobniProces generovane = new VyrobniProces();
         
         try {
-            
-            System.out.println(proces.importDat("./import.csv"));
-            Iterator<Proces> it = proces.iterator();
 
-            AbstrDoubleList<Proces> proces2 = DataGenerator.nahodneGenerovanaData(20);
-            Iterator<Proces> it2 = proces2.iterator();
+            generovane.generatorDat(21);
+            Iterator<Proces> genIt = generovane.iterator();
+            System.out.println("Generovane:");
+            while (genIt.hasNext()) {
+                System.out.println(genIt.next());
+            }
 
-            while (it2.hasNext()) {
-                System.out.println(it2.next());
+            importovane.importDat("./import.csv");
+            Iterator<Proces> impIt = importovane.iterator();
+            System.out.println("Importovane:");
+            while (impIt.hasNext()) {
+                System.out.println(impIt.next());
             }
-/*
-            while (it.hasNext()) {
-                System.out.println(it.next());
-            }
-*/
 
         } catch (VyrobniProcesException e) {
             System.out.println(e.getMessage());

@@ -8,9 +8,11 @@ import enums.EReorg;
 
 public interface IVyrobniProces extends Iterable<Proces> {
     
+    void generatorDat(int pocet);
+    void exportDat(String soubor);
     int importDat(String soubor) throws VyrobniProcesException, FileNotFoundException;
+
     void vlozProces(Proces proces, EPozice pozice) throws VyrobniProcesException;
-    
     Proces zpristupniProces(EPozice pozice) throws VyrobniProcesException;
     Proces odeberProces(EPozice pozice) throws VyrobniProcesException;
 

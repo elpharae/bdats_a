@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Iterator;
+import java.util.Random;
+
 import abstrdoublelist.AbstrDoubleList;
 import abstrdoublelist.AbstrDoubleListException;
 import abstrlifo.IAbstrLifo;
@@ -19,6 +21,55 @@ public class VyrobniProces implements IVyrobniProces {
 
     public VyrobniProces() {
         data = new AbstrDoubleList<Proces>();
+    }
+
+    @Override
+    public void generatorDat(int pocet) {
+        if (pocet <= 0 || pocet > 50) {
+            throw new IllegalArgumentException();
+        }
+
+        data.zrus();
+
+        // ciselne hranice jsem urcil podle vzoroveho souboru import.csv
+        final int MIN_POCET_OSOB = 2;
+        final int MAX_POCET_OSOB = 8;
+        final int MIN_CAS_PROCESU = 2;
+        final int MAX_CAS_PROCESU = 30;
+
+        Random RND = new Random();
+        Proces proces;
+        String id;
+        int pocetOsob;
+        int casProcesu;
+
+        int pocetManual = 0;
+        int pocetRobot = 0;
+
+        for (int i = 0; i < pocet; i++) {
+            pocetOsob = RND.nextInt(MAX_POCET_OSOB - MIN_POCET_OSOB) + MIN_POCET_OSOB;
+            casProcesu = RND.nextInt(MAX_CAS_PROCESU - MIN_CAS_PROCESU) + MIN_CAS_PROCESU;
+
+            if (RND.nextInt(2) >= 1) {
+                pocetManual++;
+
+                id = "O1" + "0".repeat(2 - Integer.toString(pocetManual).length()) + pocetManual;
+                proces = new ProcesManualni(id, pocetOsob, casProcesu);
+                data.vlozPosledni(proces);
+            } else {
+                pocetRobot++;
+            
+                id = "R1" + "0".repeat(2 - Integer.toString(pocetRobot).length()) + pocetRobot;
+                proces = new ProcesRoboticky(id, casProcesu);
+                data.vlozPosledni(proces);
+            }
+        }
+    }
+
+    @Override
+    public void exportDat(String soubor) {
+        
+        
     }
 
     @Override
