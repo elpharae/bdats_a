@@ -1,4 +1,4 @@
-package proces;
+package procesy;
 
 import java.io.Serializable;
 
@@ -8,6 +8,10 @@ public abstract class Proces implements Serializable {
     private int casProcesu;
 
     public Proces(String id, int casProcesu) {
+        if (id.isEmpty() || casProcesu < 0) {
+            throw new IllegalArgumentException();
+        }
+
         this.id = id;
         this.casProcesu = casProcesu;
     }
@@ -26,6 +30,11 @@ public abstract class Proces implements Serializable {
 
     public void setCasProcesu(int casProcesu) {
         this.casProcesu = casProcesu;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("ID: %s; Cas procesu: %d", this.id, this.casProcesu);
     }
     
 }

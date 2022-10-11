@@ -1,4 +1,4 @@
-package proces;
+package procesy;
 
 public class ProcesManualni extends Proces {
     
@@ -6,6 +6,11 @@ public class ProcesManualni extends Proces {
 
     public ProcesManualni(String id, int pocetOsob, int casProcesu) {
         super(id, casProcesu);
+
+        if (pocetOsob < 0) {
+            throw new IllegalArgumentException();
+        }
+
         this.pocetOsob = pocetOsob;
     }
 
@@ -15,6 +20,11 @@ public class ProcesManualni extends Proces {
 
     public void setPocetOsob(int pocetOsob) {
         this.pocetOsob = pocetOsob;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + String.format("; Pocet osob: %d", this.pocetOsob);
     }
     
 }
