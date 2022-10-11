@@ -87,6 +87,7 @@ public class AbstrDoubleList<T> implements IAbstrDoubleList<T>, Serializable {
             throw new NullPointerException();
         }
 
+        // pokud je seznam prazdny, tak tato metoda inicializuje seznam
         if (this.pocet == 0) {
             vlozDoPrazdneho(data);
         } else {
@@ -119,6 +120,7 @@ public class AbstrDoubleList<T> implements IAbstrDoubleList<T>, Serializable {
             throw new AbstrDoubleListException("Seznam prazdny nebo nebyl zvolen aktualni prvek");
         }
 
+        // pokud je seznam prazdny, tak tato metoda inicializuje seznam
         if (this.aktualni == this.posledni) {
             vlozPosledni(data);
         } else {
