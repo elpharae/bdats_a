@@ -1,5 +1,6 @@
 package abstrlifo;
 
+import java.util.Iterator;
 import abstrdoublelist.AbstrDoubleList;
 import abstrdoublelist.AbstrDoubleListException;
 
@@ -22,7 +23,7 @@ public class AbstrLifo<T> implements IAbstrLifo<T> {
     }
 
     @Override
-    public void vloz(T data) throws AbstrLifoException {
+    public void vloz(T data) {
         if (data == null) {
             throw new NullPointerException();
         }
@@ -31,22 +32,50 @@ public class AbstrLifo<T> implements IAbstrLifo<T> {
             struktura.vlozPosledni(data);
             struktura.zpristupniPosledni();
         } catch (AbstrDoubleListException e) {
-            // sem by se to v pripade zadnych chyb v kodu nemelo nikdy dostat?
+            // sem se to nikdy nedostane
             // metoda zpristupniPosledni vyusti v chybu pouze tehdy, je-li seznam prazdny,
             // coz nikdy nebude v pripade, ze hned pred jejim zavolanim vlozim do seznamu data
-            throw new AbstrLifoException("Chyba zasobniku");
         }
     }
 
     @Override
     public T odeber() throws AbstrLifoException {
         try {
-            T data = struktura.odeberPosledni();
-            struktura.zpristupniPosledni();
-            return data;
+            return struktura.odeberPosledni();
         } catch (AbstrDoubleListException e) {
             throw new AbstrLifoException("Zasobnik je prazdny");
         }
+    }
+
+    @Override
+    public Iterator<T> iterator() {
+        return struktura.iterator();
+        /*
+        return new Iterator<T>() {
+
+            private AbstrDoubleList<T> iteratorData = struktura;
+
+
+            @Override
+            public boolean hasNext() {
+                return !iteratorData.jePrazdny();
+            }
+
+            @Override
+            public T next() {
+                if (!hasNext()) {
+                    return null;
+                }
+
+                try {
+                    return iteratorData.odeberPosledni();
+                } catch (AbstrDoubleListException e) {
+                    // sem se to nikdy nedostane
+                    return null;
+                }
+            }
+        };
+         */
     }
     
 }

@@ -1,11 +1,16 @@
 package abstrlifo;
 
-public interface IAbstrLifo<T> {
+import java.util.Iterator;
+
+public interface IAbstrLifo<T> extends Iterable<T> {
 
     void zrus();
     boolean jePrazdny();
 
-    void vloz(T data) throws AbstrLifoException;
+    void vloz(T data);
     T odeber() throws AbstrLifoException;
+
+    @Override
+    Iterator<T> iterator();
 
 }

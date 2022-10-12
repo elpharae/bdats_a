@@ -194,6 +194,7 @@ public class AbstrDoubleList<T> implements IAbstrDoubleList<T>, Serializable {
         if (this.pocet == 0) {
             throw new AbstrDoubleListException("Seznam prazdny");
         }
+        
         this.aktualni = this.posledni;
         return zpristupniAktualni();
     }

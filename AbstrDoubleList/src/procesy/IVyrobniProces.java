@@ -17,9 +17,9 @@ public interface IVyrobniProces extends Iterable<Proces> {
     Proces odeberProces(EPozice pozice) throws VyrobniProcesException;
 
     Iterator<Proces> iterator();
-    IAbstrLifo<Proces> vytipujKandidatiReorg(int cas, EReorg reorgan);
+    IAbstrLifo<Proces> vytipujKandidatiReorg(int cas, EReorg reorgan) throws VyrobniProcesException;
 
-    void reorganizace(EReorg reorgan, IAbstrLifo<Proces> zasobnik);
+    void reorganizace(EReorg reorgan, IAbstrLifo<Proces> zasobnik) throws VyrobniProcesException;
     void zrus();
 
 }

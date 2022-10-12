@@ -11,6 +11,8 @@ import java.util.Random;
 
 import abstrdoublelist.AbstrDoubleList;
 import abstrdoublelist.AbstrDoubleListException;
+import abstrlifo.AbstrLifo;
+import abstrlifo.AbstrLifoException;
 import abstrlifo.IAbstrLifo;
 import enums.EPozice;
 import enums.EReorg;
@@ -85,7 +87,9 @@ public class VyrobniProces implements IVyrobniProces {
         try (
                 BufferedReader reader = new BufferedReader(new FileReader(soubor));
             ) {
-            reader.readLine(); //skip hlavicky csv souboru
+
+            //skip hlavicky csv souboru
+            reader.readLine(); 
             String radek;
             int pocet = 0;
 
@@ -217,27 +221,147 @@ public class VyrobniProces implements IVyrobniProces {
     }
 
     @Override
-    public IAbstrLifo<Proces> vytipujKandidatiReorg(int cas, EReorg reorgan) {
-        /*
-         * 
-         * 
-         */
+    public IAbstrLifo<Proces> vytipujKandidatiReorg(int cas, EReorg reorgan) throws VyrobniProcesException {
+        if (reorgan == null) {
+            throw new NullPointerException();
+        }
 
-        return null;
+        if (cas <= 0) {
+            throw new IllegalArgumentException();
+        }
+
+        AbstrLifo<Proces> zasobnik = new AbstrLifo<Proces>();
+        Iterator<Proces> iterator = data.iterator();
+
+        switch (reorgan) {
+            case AGREGACE -> {
+                Proces p1 = null;
+                Proces p2 = null;
+    
+                while (iterator.hasNext()) {
+                    p2 = p1;
+                    p1 = iterator.next();
+
+                    if (!(p1 instanceof ProcesManualni) || !(p2 instanceof ProcesManualni)) {
+                        continue;
+                    }
+
+                    if (p1.getCasProcesu() < cas && p2.getCasProcesu() < cas) {
+                        zasobnik.vloz(p1);
+                        zasobnik.vloz(p2);
+
+                        p1 = null;
+                        p2 = null;
+                    }
+                }
+            }
+            case DEKOMPOZICE -> {
+                while (iterator.hasNext()) {
+                    Proces proces = iterator.next();
+
+                    if (!(proces instanceof ProcesManualni)) {
+                        continue;
+                    }
+    
+                    if (proces.getCasProcesu() > cas) {
+                        zasobnik.vloz(proces);
+                    }
+                }
+            }
+        }
+
+        return zasobnik;
     }
 
     @Override
-    public void reorganizace(EReorg reorgan, IAbstrLifo<Proces> zasobnik) {
-        /*
-         * 
-         * 
-         */
+    public void reorganizace(EReorg reorgan, IAbstrLifo<Proces> zasobnik) throws VyrobniProcesException {
+        if (reorgan == null || zasobnik == null) {
+            throw new NullPointerException();
+        }
 
+        if (zasobnik.jePrazdny()) {
+            throw new IllegalArgumentException();
+        }
+
+        switch (reorgan) {
+            case AGREGACE -> {
+                Proces p1;
+                Proces p2;
+                while (!zasobnik.jePrazdny()) {
+                    try {
+                        p1 = zasobnik.odeber();
+                        p2 = zasobnik.odeber();
+
+                        if (p1 instanceof ProcesManualni pm1 && p2 instanceof ProcesManualni pm2) {
+                            // NEJSPIS SE JESTE ZMENI
+                            // AZ ZJISTIM, JAK TO ROZPOCITAT :)
+                            int pocetOsob = pm1.getPocetOsob() + pm2.getPocetOsob();
+                            int casProcesu = (pm1.getCasProcesu() + pm2.getCasProcesu()) / 4;
+
+                            ProcesManualni novyProces = new ProcesManualni(p1.getId(), pocetOsob, casProcesu);
+
+                            data.zpristupniPrvni();
+                            while (data.zpristupniAktualni() != p1) {
+                                data.zpristupniNaslednika();
+                            }
+
+                            data.odeberNaslednika();
+                            data.odeberAktualni();
+                            data.vlozPosledni(novyProces);
+                        }
+                    } catch (AbstrLifoException e) {
+                        throw new VyrobniProcesException("Poskytnuty zasobnik nema sudy pocet procesu");
+                    } catch (AbstrDoubleListException e) {
+                        throw new VyrobniProcesException("Seznam procesu je prazdny");
+                    }
+                }
+            }
+            case DEKOMPOZICE -> {
+                try {
+                    data.zpristupniPosledni();
+                    while (!(data.zpristupniAktualni() instanceof ProcesManualni)) {
+                        data.zpristupniPredchudce();
+                    }
+
+                    int startId = Integer.parseInt(data.zpristupniAktualni().getId().substring(1)) + 1;
+
+                    Proces proces;
+                    while (!zasobnik.jePrazdny()) {
+                        proces = zasobnik.odeber();
+
+                        if (proces instanceof ProcesManualni pm) {
+                            // NEJSPIS SE JESTE ZMENI
+                            // AZ ZJISTIM, JAK TO ROZPOCITAT :)
+                            int pocetOsob1 = (pm.getPocetOsob() / 2) + (pm.getPocetOsob() % 2);
+                            int pocetOsob2 = (pm.getPocetOsob() / 2);
+                            int casProcesu1 = (pm.getCasProcesu() / 2) + (pm.getCasProcesu() % 2);
+                            int casProcesu2 = (pm.getCasProcesu() / 2) + (pm.getCasProcesu() % 2);
+
+                            ProcesManualni p1 = new ProcesManualni("O" + (startId++), pocetOsob1, casProcesu1);
+                            ProcesManualni p2 = new ProcesManualni("O" + (startId++), pocetOsob2, casProcesu2);
+
+                            data.zpristupniPrvni();
+                            while (data.zpristupniAktualni() != proces) {
+                                data.zpristupniNaslednika();
+                            }
+
+                            data.odeberAktualni();
+                            data.vlozPosledni(p1);
+                            data.vlozPosledni(p2);
+                        }
+                    }
+                } catch (AbstrDoubleListException e) {
+                    throw new VyrobniProcesException("Seznam procesu je prazdny");
+                } catch (AbstrLifoException e) {
+                    throw new VyrobniProcesException("Poskytnuty zasobnik je prazdny");
+                }
+
+            }
+        }
     }
 
     @Override
     public void zrus() {
         data.zrus();
     }
-    
 }
