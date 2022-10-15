@@ -50,6 +50,7 @@ public class AbstrDoubleList<T> implements IAbstrDoubleList<T> {
         this.prvni.predchozi = this.prvni;
         this.prvni.dalsi = this.prvni;
         this.posledni = this.prvni;
+        this.aktualni = this.prvni;
     }
 
     @Override

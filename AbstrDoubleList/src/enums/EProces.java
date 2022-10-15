@@ -1,12 +1,12 @@
 package enums;
 
-public enum EReorg {
-    DEKOMPOZICE("Dekompozice"),
-    AGREGACE("Agregace");
+public enum EProces {
+    MANUALNI("Manuální"),
+    ROBOTICKY("Robotický");
 
     private String nazev;
 
-    EReorg(String nazev) {
+    EProces(String nazev) {
         this.nazev = nazev;
     }
 

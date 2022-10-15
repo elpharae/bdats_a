@@ -11,8 +11,11 @@ public class VyrobniProcesGUI extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getResource("VyrobniProcesGUIFXML.fxml"));
-        primaryStage.setTitle("Hello World");
-        primaryStage.setScene(new Scene(root, 400, 300));
+
+        primaryStage.setTitle("Semestrální práce A - Výrobní procesy");
+        primaryStage.setScene(new Scene(root, 600, 600));
+        primaryStage.setResizable(false);
+
         primaryStage.show();
     }
 
