@@ -1,16 +1,15 @@
 package abstrdoublelist;
 
-import java.io.Serializable;
 import java.util.Iterator;
 
-public class AbstrDoubleList<T> implements IAbstrDoubleList<T>, Serializable {
+public class AbstrDoubleList<T> implements IAbstrDoubleList<T> {
 
     private int pocet;
     private ListItem<T> prvni;
     private ListItem<T> aktualni;
     private ListItem<T> posledni;
 
-    private static class ListItem<T> implements Serializable {
+    private static class ListItem<T> {
 
         private final T data;
         private ListItem<T> dalsi;

@@ -1,8 +1,6 @@
 package procesy;
 
-import java.io.Serializable;
-
-public abstract class Proces implements Serializable {
+public abstract class Proces {
     
     private String id;
     private int casProcesu;

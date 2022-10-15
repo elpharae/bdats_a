@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Random;
 
@@ -40,6 +41,8 @@ public class VyrobniProces implements IVyrobniProces {
         final int MAX_CAS_PROCESU = 30;
 
         Random RND = new Random();
+        RND.setSeed(new Date().getTime());
+
         Proces proces;
         String id;
         int pocetOsob;
@@ -279,10 +282,6 @@ public class VyrobniProces implements IVyrobniProces {
             throw new NullPointerException();
         }
 
-        if (zasobnik.jePrazdny()) {
-            throw new IllegalArgumentException();
-        }
-
         switch (reorgan) {
             case AGREGACE -> {
                 Proces p1;
@@ -310,7 +309,7 @@ public class VyrobniProces implements IVyrobniProces {
                             data.vlozPosledni(novyProces);
                         }
                     } catch (AbstrLifoException e) {
-                        throw new VyrobniProcesException("Poskytnuty zasobnik nema sudy pocet procesu");
+                        throw new VyrobniProcesException("Poskytnuty zasobnik nema sudy pocet procesu nebo je prazdny");
                     } catch (AbstrDoubleListException e) {
                         throw new VyrobniProcesException("Seznam procesu je prazdny");
                     }

@@ -34,7 +34,9 @@ public class AbstrLifo<T> implements IAbstrLifo<T> {
         } catch (AbstrDoubleListException e) {
             // sem se to nikdy nedostane
             // metoda zpristupniPosledni vyusti v chybu pouze tehdy, je-li seznam prazdny,
-            // coz nikdy nebude v pripade, ze hned pred jejim zavolanim vlozim do seznamu data
+            // coz se nikdy nestane, jelikoz pred jejim zavolanim vkladam do seznamu data
+            // ktera nemohou byt null, coz zajistuje podminka jak na zacatku teto metody,
+            // tak na zacatku metody vlozPosledni
         }
     }
 
@@ -50,32 +52,6 @@ public class AbstrLifo<T> implements IAbstrLifo<T> {
     @Override
     public Iterator<T> iterator() {
         return struktura.iterator();
-        /*
-        return new Iterator<T>() {
-
-            private AbstrDoubleList<T> iteratorData = struktura;
-
-
-            @Override
-            public boolean hasNext() {
-                return !iteratorData.jePrazdny();
-            }
-
-            @Override
-            public T next() {
-                if (!hasNext()) {
-                    return null;
-                }
-
-                try {
-                    return iteratorData.odeberPosledni();
-                } catch (AbstrDoubleListException e) {
-                    // sem se to nikdy nedostane
-                    return null;
-                }
-            }
-        };
-         */
     }
     
 }
