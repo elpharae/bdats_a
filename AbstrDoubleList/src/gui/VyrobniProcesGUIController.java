@@ -1,5 +1,9 @@
 package gui;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -19,11 +23,13 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
+import javafx.stage.FileChooser;
 import procesy.Proces;
 import procesy.ProcesManualni;
 import procesy.ProcesRoboticky;
 import procesy.VyrobniProces;
 import procesy.VyrobniProcesException;
+import javafx.stage.FileChooser.ExtensionFilter;
 
 public class VyrobniProcesGUIController {
 
@@ -104,7 +110,21 @@ public class VyrobniProcesGUIController {
 
     @FXML
     void exportuj(ActionEvent event) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Exportovat ze souboru...");
+        fileChooser.getExtensionFilters().addAll(new ExtensionFilter("CSV Files", ".csv"));
 
+        File file = fileChooser.showSaveDialog(VyrobniProcesGUI.primaryStage);
+
+        if (file != null) {
+            try (
+                PrintWriter writer = new PrintWriter(file);
+            ) {
+                writer.println(this.vyrobniProces.exportDat());
+            } catch (IOException e) {
+                errorDialog(e.getMessage());
+            }
+        }
     }
 
     @FXML
@@ -121,7 +141,21 @@ public class VyrobniProcesGUIController {
 
     @FXML
     void importuj(ActionEvent event) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Importovat ze souboru...");
+        fileChooser.getExtensionFilters().addAll(new ExtensionFilter("CSV Files", "*.csv"));
 
+        File file = fileChooser.showOpenDialog(VyrobniProcesGUI.primaryStage);
+
+        if (file != null) {
+            try {
+                this.vyrobniProces.importDat(file.getPath().trim());
+
+                zobrazitDataVListView();
+            } catch (FileNotFoundException | IllegalArgumentException | VyrobniProcesException e) {
+                errorDialog(e.getMessage());
+            }
+        }
     }
 
     @FXML
@@ -137,21 +171,29 @@ public class VyrobniProcesGUIController {
 
             zobrazitDataVListView();
         } catch (VyrobniProcesException e) {
-            errorDialog(AlertType.ERROR, "Chyba", e.getMessage());
+            errorDialog(e.getMessage());
         }
     }
 
     @FXML
     void reorganizujProcesy(ActionEvent event) {
         try {
+            if (this.kandidati == null) {
+                throw new NullPointerException("Nelze zobrazit kandidaty, dosud nebyli vytipovani");
+            }
+
+            if (this.kandidati.jePrazdny()) {
+                throw new IllegalArgumentException("Program nenalezl zadne kandidaty na reorganizaci");
+            }
+
             switch (this.cbReorg.getSelectionModel().getSelectedItem()) {
                 case AGREGACE -> vyrobniProces.reorganizace(EReorg.AGREGACE, this.kandidati);
                 case DEKOMPOZICE -> vyrobniProces.reorganizace(EReorg.DEKOMPOZICE, this.kandidati);
             }
 
             zobrazitDataVListView();
-        } catch (VyrobniProcesException e) {
-            errorDialog(AlertType.ERROR, "Chyba", e.getMessage());
+        } catch (VyrobniProcesException | NullPointerException | IllegalArgumentException e) {
+            errorDialog(e.getMessage());
         }
     }
 
@@ -159,7 +201,7 @@ public class VyrobniProcesGUIController {
     void vlozProces(ActionEvent event) {
         try {
             if (this.fieldPocetOsob.getText().isEmpty() || this.fieldCasProcesu.getText().isEmpty()) {
-                throw new NumberFormatException();
+                throw new NumberFormatException("Vstupni data ve spatnem formatu, zadejte pouze cisla");
             }
 
             Iterator<Proces> it = this.vyrobniProces.iterator();
@@ -221,9 +263,9 @@ public class VyrobniProcesGUIController {
 
             zobrazitDataVListView();
         } catch (NumberFormatException e) {
-            errorDialog(AlertType.ERROR, "Chyba", "Vstupni data ve spatnem formatu, zadejte pouze cisla");
+            errorDialog(e.getMessage());
         } catch (VyrobniProcesException e) {
-            errorDialog(AlertType.ERROR, "Chyba", e.getMessage());
+            errorDialog(e.getMessage());
         }
     }
 
@@ -239,22 +281,27 @@ public class VyrobniProcesGUIController {
             }
 
             zobrazitDataVListView();
-        } catch (VyrobniProcesException e) {
-            errorDialog(AlertType.ERROR, "Chyba", e.getMessage());
+        } catch (VyrobniProcesException | NullPointerException e) {
+            errorDialog(e.getMessage());
         }
     }
 
     @FXML
     void vymazProcesy(ActionEvent event) {
         this.vyrobniProces.zrus();
+
         zobrazitDataVListView();
     }
 
     @FXML
     void vytipujKandidaty(ActionEvent event) {
         try {
+            if (this.listProcesy.getItems().size() == 0) {
+                throw new VyrobniProcesException("Seznam vyrobnich procesu je prazdny, nelze vytipovat kandidaty");
+            }
+
             if (this.fieldKriterium.getText().isEmpty()) {
-                throw new NumberFormatException();
+                throw new NumberFormatException("Vstupni data ve spatnem formatu, zadejte pouze cisla");
             }
 
             switch (this.cbVytipuj.getSelectionModel().getSelectedItem()) {
@@ -263,17 +310,20 @@ public class VyrobniProcesGUIController {
             }
 
             zobrazitDataVListView();
-        } catch (NumberFormatException e) {
-            errorDialog(AlertType.ERROR, "Chyba", "Vstupni data ve spatnem formatu, zadejte pouze cisla");
-        } catch (VyrobniProcesException e) {
-            errorDialog(AlertType.ERROR, "Chyba", e.getMessage());
+        } catch (NumberFormatException | VyrobniProcesException e) {
+            errorDialog(e.getMessage());
         }
     }
 
     @FXML
     void zobrazKandidaty(ActionEvent event) {
-
-    }
+        try {
+            VytipovaniKandidatiDialog.zobrazOkno(this.kandidati);
+        } catch (IllegalArgumentException | NullPointerException e) {
+            errorDialog(e.getMessage());
+        }
+        
+    }   
 
     private void zobrazitDataVListView() {
         listProcesy.getItems().clear();
@@ -293,16 +343,16 @@ public class VyrobniProcesGUIController {
                     strProces = "    " + strProces;
                 }
             } catch (VyrobniProcesException e) {
-                errorDialog(AlertType.ERROR, "Chyba", e.getMessage());
+                errorDialog(e.getMessage());
             }
 
             listProcesy.getItems().add(strProces);
         }
     }
 
-    private void errorDialog(AlertType typ, String title, String contentText) {
-        Alert alert = new Alert(typ);
-        alert.setTitle(title);
+    private void errorDialog(String contentText) {
+        Alert alert = new Alert(AlertType.ERROR);
+        alert.setTitle("Chyba");
         alert.setHeaderText(null);
         alert.setContentText(contentText);
 

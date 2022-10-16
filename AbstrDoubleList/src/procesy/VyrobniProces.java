@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Random;
@@ -72,20 +73,35 @@ public class VyrobniProces implements IVyrobniProces {
     }
 
     @Override
-    public void exportDat(String soubor) {
-        
-        
+    public String exportDat() {
+        StringBuilder fileContent = new StringBuilder();
+        fileContent.append("IdProc;persons;time\n");
+
+        Iterator<Proces> iterator = iterator();
+        while (iterator.hasNext()) {
+            Proces p = iterator.next();
+            
+            if (p instanceof ProcesManualni pm) {
+                fileContent.append(pm.getId() + ";" + pm.getPocetOsob() + ";" + pm.getCasProcesu() + "\n");
+            } else if (p instanceof ProcesRoboticky pr) {
+                fileContent.append(pr.getId() + ";" + 0 + ";" + pr.getCasProcesu() + "\n");
+            }
+        }
+
+        return fileContent.toString();
     }
 
     @Override
     public int importDat(String soubor) throws VyrobniProcesException, FileNotFoundException {
         if (soubor.isEmpty()) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Vybrany soubor neexistuje");
         }
 
         if (!Files.exists(Paths.get(soubor))) {
-            throw new FileNotFoundException();
+            throw new FileNotFoundException("Vybrany soubor neexistuje");
         }
+
+        this.data.zrus();
 
         try (
                 BufferedReader reader = new BufferedReader(new FileReader(soubor));
@@ -97,13 +113,15 @@ public class VyrobniProces implements IVyrobniProces {
             int pocet = 0;
 
             while ((radek = reader.readLine()) != null) {
+                if (radek.length() == 0 || radek.isEmpty()) break;
+
                 String[] radekData = radek.split(";");
                 Proces proces;
-
+                
                 if (radekData[0].charAt(0) == 'R') {
                     proces = new ProcesRoboticky(radekData[0], Integer.parseInt(radekData[2]));
                 } else {
-                    proces = new ProcesManualni(radekData[0], Integer.parseInt(radekData[1]), Integer.parseInt(radekData[2]));
+                    proces = new ProcesManualni(radekData[0], Integer.parseInt(radekData[2]), Integer.parseInt(radekData[1]));
                 }
                 
                 data.vlozPosledni(proces);
@@ -120,11 +138,11 @@ public class VyrobniProces implements IVyrobniProces {
     @Override
     public void vlozProces(Proces proces, EPozice pozice) throws VyrobniProcesException {
         if (pozice == EPozice.AKTUALNI) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Nelze vlozit na aktualni pozici");
         }
 
         if (pozice == null) {
-            throw new NullPointerException();
+            throw new NullPointerException("Spatne vybrana pozice");
         }
 
         try {
@@ -155,7 +173,7 @@ public class VyrobniProces implements IVyrobniProces {
     @Override
     public Proces zpristupniProces(EPozice pozice) throws VyrobniProcesException {
         if (pozice == null) {
-            throw new NullPointerException();
+            throw new NullPointerException("Spatne vybrana pozice");
         }
 
         try {

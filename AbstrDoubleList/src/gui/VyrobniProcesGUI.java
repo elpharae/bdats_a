@@ -8,15 +8,19 @@ import javafx.stage.Stage;
 
 public class VyrobniProcesGUI extends Application {
 
+    static Stage primaryStage;
+
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage stage) throws Exception {
+        VyrobniProcesGUI.primaryStage = stage;
+
         Parent root = FXMLLoader.load(getClass().getResource("VyrobniProcesGUIFXML.fxml"));
 
-        primaryStage.setTitle("Semestrální práce A - Výrobní procesy");
-        primaryStage.setScene(new Scene(root, 600, 600));
-        primaryStage.setResizable(false);
+        stage.setTitle("Semestrální práce A - Výrobní procesy");
+        stage.setScene(new Scene(root, 600, 600));
+        stage.setResizable(false);
 
-        primaryStage.show();
+        stage.show();
     }
 
 
