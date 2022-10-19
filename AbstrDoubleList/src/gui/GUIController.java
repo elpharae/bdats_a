@@ -31,7 +31,7 @@ import procesy.VyrobniProces;
 import procesy.VyrobniProcesException;
 import javafx.stage.FileChooser.ExtensionFilter;
 
-public class VyrobniProcesGUIController {
+public class GUIController {
 
     private VyrobniProces vyrobniProces;
     private IAbstrLifo<Proces> kandidati;
@@ -111,10 +111,10 @@ public class VyrobniProcesGUIController {
     @FXML
     void exportuj(ActionEvent event) {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Exportovat ze souboru...");
-        fileChooser.getExtensionFilters().addAll(new ExtensionFilter("CSV Files", ".csv"));
+        fileChooser.setTitle("Vyberte cílový soubor");
+        fileChooser.getExtensionFilters().addAll(new ExtensionFilter("CSV Files", "*.csv"));
 
-        File file = fileChooser.showSaveDialog(VyrobniProcesGUI.primaryStage);
+        File file = fileChooser.showSaveDialog(GUI.primaryStage);
 
         if (file != null) {
             try (
@@ -142,10 +142,10 @@ public class VyrobniProcesGUIController {
     @FXML
     void importuj(ActionEvent event) {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Importovat ze souboru...");
+        fileChooser.setTitle("Vyberte zdrojový soubor");
         fileChooser.getExtensionFilters().addAll(new ExtensionFilter("CSV Files", "*.csv"));
 
-        File file = fileChooser.showOpenDialog(VyrobniProcesGUI.primaryStage);
+        File file = fileChooser.showOpenDialog(GUI.primaryStage);
 
         if (file != null) {
             try {
@@ -179,11 +179,11 @@ public class VyrobniProcesGUIController {
     void reorganizujProcesy(ActionEvent event) {
         try {
             if (this.kandidati == null) {
-                throw new NullPointerException("Nelze zobrazit kandidaty, dosud nebyli vytipovani");
+                throw new NullPointerException("Nelze zobrazit kandidáty, protože dosud nebyli vytipováni.");
             }
 
             if (this.kandidati.jePrazdny()) {
-                throw new IllegalArgumentException("Program nenalezl zadne kandidaty na reorganizaci");
+                throw new IllegalArgumentException("Program nenalezl žádné kandidáty k reorganizaci.");
             }
 
             switch (this.cbReorg.getSelectionModel().getSelectedItem()) {
@@ -201,7 +201,7 @@ public class VyrobniProcesGUIController {
     void vlozProces(ActionEvent event) {
         try {
             if (this.fieldPocetOsob.getText().isEmpty() || this.fieldCasProcesu.getText().isEmpty()) {
-                throw new NumberFormatException("Vstupni data ve spatnem formatu, zadejte pouze cisla");
+                throw new NumberFormatException("Vstupní data ve špatném formátu, zadejte pouze čisla");
             }
 
             Iterator<Proces> it = this.vyrobniProces.iterator();
@@ -238,8 +238,7 @@ public class VyrobniProcesGUIController {
             }
 
             int pocetOsob = Integer.parseInt(this.fieldPocetOsob.getText());
-            int casProcesu = Integer.parseInt(this.fieldPocetOsob.getText());
-
+            int casProcesu = Integer.parseInt(this.fieldCasProcesu.getText());
             Proces proces = null;
 
             switch (this.cbTypProcesu.getSelectionModel().getSelectedItem()) {
@@ -297,11 +296,11 @@ public class VyrobniProcesGUIController {
     void vytipujKandidaty(ActionEvent event) {
         try {
             if (this.listProcesy.getItems().size() == 0) {
-                throw new VyrobniProcesException("Seznam vyrobnich procesu je prazdny, nelze vytipovat kandidaty");
+                throw new VyrobniProcesException("Seznam výrobních procesů je prazdný, nelze vytipovat kandidáty.");
             }
 
             if (this.fieldKriterium.getText().isEmpty()) {
-                throw new NumberFormatException("Vstupni data ve spatnem formatu, zadejte pouze cisla");
+                throw new NumberFormatException("Vstupní data ve špatneé formátu, zadejte pouze čísla.");
             }
 
             switch (this.cbVytipuj.getSelectionModel().getSelectedItem()) {
@@ -310,6 +309,7 @@ public class VyrobniProcesGUIController {
             }
 
             zobrazitDataVListView();
+            zobrazKandidaty(event);
         } catch (NumberFormatException | VyrobniProcesException e) {
             errorDialog(e.getMessage());
         }
@@ -318,7 +318,7 @@ public class VyrobniProcesGUIController {
     @FXML
     void zobrazKandidaty(ActionEvent event) {
         try {
-            VytipovaniKandidatiDialog.zobrazOkno(this.kandidati);
+            KandidatiDialog.zobrazOkno(this.kandidati);
         } catch (IllegalArgumentException | NullPointerException e) {
             errorDialog(e.getMessage());
         }

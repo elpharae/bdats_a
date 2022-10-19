@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.VyrobniProcesGUIController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.GUIController">
    <left>
       <BorderPane prefHeight="600.0" prefWidth="290.0" BorderPane.alignment="CENTER">
          <center>
@@ -48,14 +48,14 @@
                         </FlowPane>
                         <FlowPane alignment="CENTER" columnHalignment="CENTER" hgap="10.0" prefHeight="32.0" prefWidth="200.0">
                            <children>
-                              <Label text="Počet osob" textAlignment="CENTER" />
-                              <TextField fx:id="fieldPocetOsob" />
+                              <Label text="Čas procesu" textAlignment="CENTER" />
+                              <TextField fx:id="fieldCasProcesu" />
                            </children>
                         </FlowPane>
                         <FlowPane alignment="CENTER" columnHalignment="CENTER" hgap="10.0" prefHeight="32.0" prefWidth="200.0">
                            <children>
-                              <Label text="Čas procesu" textAlignment="CENTER" />
-                              <TextField fx:id="fieldCasProcesu" />
+                              <Label text="Počet osob" textAlignment="CENTER" />
+                              <TextField fx:id="fieldPocetOsob" />
                            </children>
                         </FlowPane>
                      </children>
@@ -99,7 +99,7 @@
                   <FlowPane alignment="CENTER" columnHalignment="CENTER" orientation="VERTICAL" prefHeight="81.0" prefWidth="355.0">
                      <children>
                         <Label text="Počet náhodně generovaných dat" />
-                        <Slider fx:id="sldGeneruj" majorTickUnit="50.0" max="50.0" min="1.0" minorTickCount="5" prefHeight="29.0" prefWidth="225.0" showTickLabels="true" showTickMarks="true" snapToTicks="true" />
+                        <Slider fx:id="sldGeneruj" majorTickUnit="50.0" max="50.0" min="1.0" value="20" minorTickCount="4" prefHeight="29.0" prefWidth="225.0" showTickLabels="true" showTickMarks="true" snapToTicks="true" />
                         <Button fx:id="btnGeneruj" mnemonicParsing="false" onAction="#generuj" text="Generovat..." />
                      </children>
                   </FlowPane>

@@ -6,15 +6,15 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-public class VyrobniProcesGUI extends Application {
+public class GUI extends Application {
 
     static Stage primaryStage;
 
     @Override
     public void start(Stage stage) throws Exception {
-        VyrobniProcesGUI.primaryStage = stage;
+        GUI.primaryStage = stage;
 
-        Parent root = FXMLLoader.load(getClass().getResource("VyrobniProcesGUIFXML.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("GUIFXML.fxml"));
 
         stage.setTitle("Semestrální práce A - Výrobní procesy");
         stage.setScene(new Scene(root, 600, 600));

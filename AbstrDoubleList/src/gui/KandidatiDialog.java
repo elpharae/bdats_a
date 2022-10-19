@@ -13,15 +13,15 @@ import java.util.Iterator;
 import abstrlifo.IAbstrLifo;
 import javafx.geometry.Pos;
 
-public class VytipovaniKandidatiDialog {
+public class KandidatiDialog {
     
     public static void zobrazOkno(IAbstrLifo<Proces> kandidati) {
         if (kandidati == null) {
-            throw new NullPointerException("Nelze zobrazit kandidaty, dosud nebyli vytipovani");
+            throw new NullPointerException("Nelze zobrazit kandidáty, protože dosud nebyli vytipováni.");
         } 
 
         if (kandidati.jePrazdny()) {
-            throw new IllegalArgumentException("Program nenalezl zadne kandidaty na reorganizaci");
+            throw new IllegalArgumentException("Program nenalezl žádné kandidáty k reorganizaci.");
         }
 
         Stage stage = new Stage();

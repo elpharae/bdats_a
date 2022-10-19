@@ -24,7 +24,7 @@ public class ProcesManualni extends Proces {
 
     @Override
     public String toString() {
-        return super.toString() + String.format("; Pocet osob: %d", this.pocetOsob);
+        return String.format("%s; Pocet osob: %d", super.toString(), this.pocetOsob);
     }
     
 }

@@ -28,10 +28,11 @@ public class VyrobniProces implements IVyrobniProces {
 
     @Override
     public void generatorDat(int pocet) {
-        if (pocet <= 0 || pocet > 50) {
-            throw new IllegalArgumentException();
+        if (pocet <= 0) {
+            throw new IllegalArgumentException("Počet náhodně generovaných dat musí být větší než 0");
         }
 
+        // vymazani aktualne pouzivanych dat
         data.zrus();
 
         // ciselne hranice jsem urcil podle vzoroveho souboru import.csv
@@ -93,11 +94,11 @@ public class VyrobniProces implements IVyrobniProces {
     @Override
     public int importDat(String soubor) throws VyrobniProcesException, FileNotFoundException {
         if (soubor.isEmpty()) {
-            throw new IllegalArgumentException("Vybrany soubor neexistuje");
+            throw new IllegalArgumentException("Vybraný soubor neexistuje");
         }
 
         if (!Files.exists(Paths.get(soubor))) {
-            throw new FileNotFoundException("Vybrany soubor neexistuje");
+            throw new FileNotFoundException("Vybraný soubor neexistuje");
         }
 
         this.data.zrus();
@@ -129,7 +130,7 @@ public class VyrobniProces implements IVyrobniProces {
             return pocet;
         } catch (IOException | NumberFormatException e) {
             data.zrus();
-            throw new VyrobniProcesException("Importovana data ve spatnem formatu");
+            throw new VyrobniProcesException("Importovaná data ve špatném formátu");
         }
 
     }
@@ -137,11 +138,11 @@ public class VyrobniProces implements IVyrobniProces {
     @Override
     public void vlozProces(Proces proces, EPozice pozice) throws VyrobniProcesException {
         if (pozice == EPozice.AKTUALNI) {
-            throw new IllegalArgumentException("Nelze vlozit na aktualni pozici");
+            throw new IllegalArgumentException("Nelze vložit na aktuální pozici");
         }
 
         if (pozice == null) {
-            throw new NullPointerException("Spatne vybrana pozice");
+            throw new NullPointerException("Špatně vybraná pozice");
         }
 
         try {
@@ -164,7 +165,7 @@ public class VyrobniProces implements IVyrobniProces {
                 }
             }
         } catch (AbstrDoubleListException e) {
-            throw new VyrobniProcesException("Nelze vlozit naslednika/predchudce, protoze nebyl nastaven aktualni, nebo je seznam prazdny");
+            throw new VyrobniProcesException("Nelze vložit následníka/předchůdce, protože nebyl nastaven aktuální prvek, nebo je seznam prázdný");
         }
         
     }
@@ -172,7 +173,7 @@ public class VyrobniProces implements IVyrobniProces {
     @Override
     public Proces zpristupniProces(EPozice pozice) throws VyrobniProcesException {
         if (pozice == null) {
-            throw new NullPointerException("Spatne vybrana pozice");
+            throw new NullPointerException("Špatně vybraná pozice");
         }
 
         try {
@@ -198,14 +199,14 @@ public class VyrobniProces implements IVyrobniProces {
 
             return proces;
         } catch (AbstrDoubleListException e) {
-            throw new VyrobniProcesException("Nelze zpristupnit aktualni/naslednika/predchudce, protoze nebyl nastaven aktualni, nebo je seznam prazdny");
+            throw new VyrobniProcesException("Nelze zpřístupnit následníka/předchůdce, protože nebyl nastaven aktuální prvek, nebo je seznam prázdný");
         }
     }
 
     @Override
     public Proces odeberProces(EPozice pozice) throws VyrobniProcesException {
         if (pozice == null) {
-            throw new NullPointerException();
+            throw new NullPointerException("Nebyla vybrána pozice");
         }
 
         try {
@@ -231,7 +232,7 @@ public class VyrobniProces implements IVyrobniProces {
 
             return proces;
         } catch (AbstrDoubleListException e) {
-            throw new VyrobniProcesException("Nelze odebrat aktualni/naslednika/predchudce, protoze nebyl nastaven aktualni, nebo je seznam prazdny");
+            throw new VyrobniProcesException("Nelze odebrat následníka/předchůdce, protože nebyl nastaven aktuální prvek, nebo je seznam prázdný");
         }
     }
 
@@ -243,11 +244,11 @@ public class VyrobniProces implements IVyrobniProces {
     @Override
     public IAbstrLifo<Proces> vytipujKandidatiReorg(int cas, EReorg reorgan) throws VyrobniProcesException {
         if (reorgan == null) {
-            throw new NullPointerException();
+            throw new NullPointerException("Špatně zadaný zásobník kandidátů");
         }
 
         if (cas <= 0) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Časové kritérium musí být větší než 0");
         }
 
         AbstrLifo<Proces> zasobnik = new AbstrLifo<Proces>();
@@ -266,9 +267,9 @@ public class VyrobniProces implements IVyrobniProces {
                         continue;
                     }
 
-                    if (p1.getCasProcesu() < cas && p2.getCasProcesu() < cas) {
-                        zasobnik.vloz(p1);
+                    if (p1.getCasProcesu() <= cas && p2.getCasProcesu() <= cas) {
                         zasobnik.vloz(p2);
+                        zasobnik.vloz(p1);
 
                         p1 = null;
                         p2 = null;
@@ -283,7 +284,7 @@ public class VyrobniProces implements IVyrobniProces {
                         continue;
                     }
     
-                    if (proces.getCasProcesu() > cas) {
+                    if (proces.getCasProcesu() >= cas) {
                         zasobnik.vloz(proces);
                     }
                 }
@@ -303,17 +304,14 @@ public class VyrobniProces implements IVyrobniProces {
             case AGREGACE -> {
                 Proces p1;
                 Proces p2;
-                while (!zasobnik.jePrazdny()) {
-                    try {
-                        p1 = zasobnik.odeber();
-                        p2 = zasobnik.odeber();
 
+                try {
+                    p1 = zasobnik.odeber();
+                    p2 = zasobnik.odeber();
+                    while (!zasobnik.jePrazdny()) {
                         if (p1 instanceof ProcesManualni pm1 && p2 instanceof ProcesManualni pm2) {
-                            // NEJSPIS SE JESTE ZMENI
-                            // AZ ZJISTIM, JAK TO ROZPOCITAT :)
                             int pocetOsob = pm1.getPocetOsob() + pm2.getPocetOsob();
                             int casProcesu = (pm1.getCasProcesu() + pm2.getCasProcesu()) / 4;
-
                             ProcesManualni novyProces = new ProcesManualni(p1.getId(), pocetOsob, casProcesu);
 
                             data.zpristupniPrvni();
@@ -325,12 +323,14 @@ public class VyrobniProces implements IVyrobniProces {
                             data.odeberAktualni();
                             data.vlozPosledni(novyProces);
                         }
-                    } catch (AbstrLifoException e) {
-                        throw new VyrobniProcesException("Poskytnuty zasobnik nema sudy pocet procesu nebo je prazdny");
-                    } catch (AbstrDoubleListException e) {
-                        throw new VyrobniProcesException("Seznam procesu je prazdny");
                     }
-                }
+                } catch (AbstrLifoException | AbstrDoubleListException e) {
+                    throw new VyrobniProcesException("Poskytnutý zásobník s kandidáty nemá sudý počet procesů nebo je prázdný");
+                };
+
+                
+
+
             }
             case DEKOMPOZICE -> {
                 try {
@@ -346,8 +346,6 @@ public class VyrobniProces implements IVyrobniProces {
                         proces = zasobnik.odeber();
 
                         if (proces instanceof ProcesManualni pm) {
-                            // NEJSPIS SE JESTE ZMENI
-                            // AZ ZJISTIM, JAK TO ROZPOCITAT :)
                             int pocetOsob1 = (pm.getPocetOsob() / 2) + (pm.getPocetOsob() % 2);
                             int pocetOsob2 = (pm.getPocetOsob() / 2);
                             int casProcesu1 = (pm.getCasProcesu() / 2) + (pm.getCasProcesu() % 2);
@@ -367,9 +365,9 @@ public class VyrobniProces implements IVyrobniProces {
                         }
                     }
                 } catch (AbstrDoubleListException e) {
-                    throw new VyrobniProcesException("Seznam procesu je prazdny");
+                    throw new VyrobniProcesException("Seznam procesů je prázdný");
                 } catch (AbstrLifoException e) {
-                    throw new VyrobniProcesException("Poskytnuty zasobnik je prazdny");
+                    throw new VyrobniProcesException("Poskytnutý zásobník s kandidáty je prázdný");
                 }
 
             }
